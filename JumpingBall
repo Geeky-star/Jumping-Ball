@@ -1,0 +1,85 @@
+import 'package:flutter/material.dart';
+
+void main() => runApp(MyApp());
+
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+      ),
+      home: AnimationScreen(),
+    );
+  }
+}
+
+class AnimationScreen extends StatefulWidget{
+  @override
+  _AnimationScreenState createState() => _AnimationScreenState();
+}
+
+class _AnimationScreenState extends State<AnimationScreen> with SingleTickerProviderStateMixin{
+
+  AnimationController _animationController;
+  double currentValue;
+  Animation curveAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _animationController = AnimationController(
+      duration: Duration(seconds: 6),
+      vsync: this
+    );
+
+    curveAnimation = CurvedAnimation(parent: _animationController, curve:Curves.elasticOut);
+
+    _animationController.addListener((){
+      setState(() {
+        currentValue = _animationController.value;
+      });
+    });
+
+    _animationController.repeat();
+
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+         title: Text("Ball Jumping")
+      ),
+      body:Stack(
+        children: <Widget>[
+          PositionedTransition(
+            child: Container(
+              width: 1,
+              height: 1,
+              decoration: BoxDecoration(
+                color: Colors.red,
+                shape: BoxShape.circle
+              ),
+            ),
+       rect: RelativeRectTween(begin: RelativeRect.fromLTRB(0, 0, 0, 600),
+        end: RelativeRect.fromLTRB(600,100,0,0),).animate(curveAnimation),
+          )
+        ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        child: Icon(Icons.book),
+        onPressed: (){
+          if(_animationController.isAnimating){
+            _animationController.stop();
+          }else{
+            _animationController.repeat();
+          }
+        },
+      ),
+
+    );
+  }
+}
